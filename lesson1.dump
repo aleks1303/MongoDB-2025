@@ -1,0 +1,296 @@
+use test
+
+db.users.insertMany([
+    {
+        name: 'Alex', age: 25, gender: 'male', address: {
+            city: 'Lviv',
+            street: 'Chornovola',
+            house: 25,
+            flat: 12
+        },
+        parents: [
+            'Vasia',
+            'Masha',
+        ],
+        rating: 5,
+        studying: ['js','java']
+    },
+    {
+        name: 'Natalii', age: 29, gender: 'female', address: {
+            city: 'Lviv',
+            street: 'Marko Vovchok',
+            house: 45,
+            flat: 45
+        },
+        parents: [
+            'Igor',
+            'Nina',
+        ],
+        rating: 4,
+        studying: ['python','java', 'css']
+    },
+    {
+        name: 'Alexsandr', age: 34, gender: 'male', address: {
+            city: 'Lviv',
+            street: 'Kitayska',
+            house: 10,
+            flat: 5
+        },
+        parents: [
+            'Petro',
+            'Alina',
+        ],
+        rating: 2,
+        studying: ['js','java','html']
+    },
+    {
+        name: 'Sergii', age: 12, gender: 'male',
+        parents: [
+            'Anton',
+            'Tamara',
+        ],
+        rating: 4,
+        studying: ['node','java', 'css','mongo','mysql']
+    },
+    {
+        name: 'Igor', age: 45, gender: 'male', address: {
+            city: 'Kyiv',
+            street: 'Shevchenko',
+            house: 100,
+            flat: 66
+        },
+        parents: [
+            'Igor',
+            'Igor',
+        ],
+        rating: 5,
+        studying: ['java','node']
+    },
+    {
+        name: 'Eva', age: 26, gender: 'female', address: {
+            city: 'Odessa',
+            street: 'Derebasovska',
+            house: 4,
+        },
+        parents: [
+            'Masha'
+        ],
+        rating: 2,
+        studying: ['js']
+    },
+    {
+        name: 'Kira', age: 49, gender: 'female', address: {
+            city: 'Uzgorod',
+            street: 'Doroshenka',
+            house: 201,
+            flat: 1
+        },
+        parents: [
+            'Vitaliy',
+            'Olha',
+        ],
+        rating: 2,
+        studying: ['java']
+    },
+    {
+        name: 'Vova', age: 16, gender: 'male', address: {
+            city: 'Uzgorod',
+            street: 'Bethoven',
+            house: 2,
+            flat: 145
+        },
+        rating: 3
+    }
+
+]);
+
+/*додати одного*/
+db.users.insertOne({name: 'Max', age: 18})
+
+/*додати багато*/
+db.users.insertMany([
+    {name: 'Alex', age: 18},
+    {name: 'Masha', age: 14},
+    {name: 'Dasha', age: 58},
+    {name: 'Sophia', age: 38},
+    {name: 'Ivan', age: 28},
+    {name: 'Petro', age: 8}
+]);
+
+// подивиться всіх
+db.users.find();
+
+//видалити всіх
+db.users.drop();
+
+// гнучка база даних, можна додавати що завгодно
+// но так не робиться
+db.users.insertOne({car: 'Mazda', year: 2023});
+
+//знайти всіх female
+db.users.find({gender:'female', rating:2});
+
+//знайти по id
+db.users.find({_id:ObjectId('687a4b0b39f5d9262507368a')});
+
+//знайти всіх female, але бачити тільки ім'я та вік
+// де 1 це true, а 0 - false
+db.users.find(
+    {gender:'female', rating:2},
+    {name:1, age: true, _id: 0}
+);
+
+// знайти все, що вказане, якщо є
+db.users.find({
+    $or: [
+        {rating:1},
+        {age:12},
+        {rating:2}
+    ]
+    }
+);
+
+// знайти все, що вказане, якщо є
+db.users.find({
+        $and: [
+            {rating:4},
+            {age:12},
+        ]
+    }
+);
+
+
+// знайти по age в яких є такий вік
+db.users.find({age: {$in:[12,4,34,25]}});
+
+// знайти по age в яких не є такий вік
+db.users.find({age:
+        {$not:
+                {$in: [12,4,34,25]}
+        }});
+
+//знайти всіх у кого ranting більше ніж 2
+db.users.find({rating: {$gt: 2}});
+
+//знайти всіх у кого ranting більше або рівне 2
+db.users.find({rating: {$gte: 2}});
+
+
+//знайти всіх у кого ranting менше ніж 3
+db.users.find({rating: {$lt: 3}});
+
+//знайти всіх у кого ranting менше або рівне 2
+db.users.find({rating: {$lte: 4}});
+
+//знайти всіх у кого ranting не дорівнює 2
+db.users.find({rating: {$ne: 4}});
+
+//знайти всіх у кого ranting дорівнює 2
+db.users.find({rating: {$eq: 4}});
+
+
+
+
+// пошук по тексту
+
+//знайти чиє ім'я починається на а
+db.users.find({name: /^a/}); // чутливий до регістру
+
+
+//знайти чиє ім'я починається на а
+db.users.find({name: /^a/i}); //не чутливий до регістру
+
+//знайти чиє ім'я починається на а
+db.users.find({name: /^A/}); // чутливий до регістру
+
+//знайти чиє ім'я закінчується на а
+db.users.find({name: /a$/}); // чутливий до регістру
+
+//знайти чиє ім'я з буквою l (всеодно скільки спереду чи ззаду символів
+db.users.find({name: /.*l.*/});
+
+//знайти ім'я де 3 буква t
+db.users.find({name: /.{2}t/i});
+
+//знайти чиє ім'я починається k та закінчується на а
+db.users.find({name: /^K.*a$/}); // kira
+
+
+
+//сортування
+
+//сортування по ranting
+db.users.find().sort({rating: 1});
+
+//сортування по ranting в зворотньому порядку
+db.users.find().sort({rating: -1});
+
+//сортування по ranting в зворотньому порядку та age
+db.users.find().sort({rating: -1, age: -1});
+
+//сортування по ranting в зворотньому порядку та скільки показати
+db.users.find().sort({rating: -1}).limit(2);
+
+//сортування по ranting по порядку та скільки показати і пропустити
+db.users.find().sort({rating: 1}).limit(2).skip(1);
+
+
+// update
+
+db.users.find()
+
+db.users.updateOne(
+    {_id:ObjectId("687a4b0b39f5d9262507368c")},
+    {$set: {age: 28}}
+)
+
+db.users.updateMany(
+    {gender: 'male'},
+    {$set:{gender: 'animal'}}
+)
+
+//додати поле
+db.users.updateOne(
+    {_id:ObjectId("687a4b0b39f5d9262507368c")},
+    {$set: {status:true}}
+)
+
+//видалити поле
+db.users.updateOne(
+    {_id:ObjectId("687a4b0b39f5d9262507368c")},
+    {$unset: {status:true}}
+)
+
+
+//робота за масивами
+
+// знайти всіх у кого немає батьків
+db.users.find({parents: {$exists:0}})
+db.users.find({parents: {$exists:null}})
+
+// знайти всіх у кого батьки є
+db.users.find({parents: {$exists:1}})
+
+//знайти по кількості елементів в масиві
+db.users.find({parents: {$size:1}});
+db.users.find({studying: {$size:3}, parents: {$size:2}});
+
+db.users.find({studying:'java'})
+
+//push to array
+db.users.updateOne(
+    {_id:ObjectId("687a4b0b39f5d92625073685")},
+    {$push: {studying: 'python'}}
+)
+
+// delete into array
+db.users.updateOne(
+    {_id:ObjectId("687a4b0b39f5d92625073685")},
+    {$pull: {studying: 'js'}}
+)
+
+// пошук по елементу в масиві
+db.users.find({'studying.1': 'java'})
+db.users.find({'studying.2': 'css'})
+
+db.users.deleteOne({_id:ObjectId("687a5338463eb4159978f18e")})
