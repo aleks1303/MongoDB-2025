@@ -1,0 +1,57 @@
+db.teacher.aggregate([
+    {
+        $group:
+            {
+                _id: '$lesson',
+                countLesson: {$sum: 1},
+                min: {$min: '$payment'},
+                max: {$max: '$payment'},
+                avg: {$avg: '$payment'},
+                sum: {$sum: '$payment'}
+            }
+
+    }
+])
+
+//
+db.teacher.aggregate([
+    {
+        $group: {
+            _id: '$lesson',
+            lessonCount: {$sum: 1}
+        }
+    },
+    {
+        $sort: {
+            lessonCount: 1
+        }
+    },
+    {
+        $addFields: {
+            lesson: '$_id'
+        }
+    },
+    {
+        $project: {
+            _id: 0
+        }
+    }
+]);
+
+
+//поєднування колекцій і робота з ними
+.
+db.teacher.aggregate([
+    {
+        $lookup: {
+            from: 'students',
+            localField: 'class_curator',
+            foreignField: 'class',
+            as: 'myStudents'
+        }
+    }
+])
+
+
+db.teacher.find();
+db.students.find();
