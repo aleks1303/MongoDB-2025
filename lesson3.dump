@@ -1,0 +1,107 @@
+
+
+
+// знайти студента який вивчає і англійську і математику
+db.students.find({lessons: {$all: ['english', 'mathematics']}})
+
+// знайти у кого другим предметом є математика (по індексу)
+db.students.find({'lessons.1': 'mathematics'})
+
+// знайти першого у кого другим предметом є математика (по індексу) ім'я студента
+db.students.findOne({'lessons.1': 'mathematics'}).name
+
+// знайти всіх обрізавши до двох елементів в масиві lessons
+db.students.find({}, {lessons: {$slice:2}})
+
+// знайти всіх з 3 елементами в масиві lessons
+db.students.find({lessons: {$size:3}})
+
+db.students.find({_id: ObjectId('687bb98f532e70670cbe50c0')})
+// update (додати)
+db.students.updateOne(
+    {_id: ObjectId('687bb98f532e70670cbe50c0')},
+    {$push: {lessons: 'CSS'}}
+)
+
+// update (видалити)
+db.students.updateOne(
+    {_id: ObjectId('687bb98f532e70670cbe50c0')},
+    {$pull: {lessons: 'english'}}
+)
+
+// update (видалити по індексу)
+db.students.updateOne(
+    {_id: ObjectId('687bb98f532e70670cbe50c0')},
+    {$unset: {'lessons.2': 1}}
+)
+
+
+// update (видалити)
+db.students.updateOne(
+    {_id: ObjectId('687bb98f532e70670cbe50c0')},
+    {$pull: {lessons: null}}
+)
+
+
+// видалити останній елемент
+db.students.updateOne(
+    {_id: ObjectId('687bb98f532e70670cbe50c0')},
+    {$pop: {lessons: 1}}
+)
+
+// видалити перший елемент
+db.students.updateOne(
+    {_id: ObjectId('687bb98f532e70670cbe50c0')},
+    {$pop: {lessons: -1}}
+)
+
+//додати тільки унікальні значення (без дублікатів)
+db.students.updateOne(
+    {_id: ObjectId('687bb98f532e70670cbe50c0')},
+    {$addToSet: {lessons: 'JS'}}
+)
+
+// замінити кожен елемент масиву lesson на одне значення
+db.students.updateOne(
+    {_id: ObjectId('687bb98f532e70670cbe50c0')},
+    {$set: {'lessons.$[]': 'JS'}}
+)
+
+// знайти всі null і поставити їм якесь значення (JS)
+db.students.updateOne(
+    {_id: ObjectId('687bb98f532e70670cbe50c0')},
+    {$set: {'lessons.$[item]': 'JS'}},
+    {arrayFilters:[{item:null}]}
+)
+
+//знайти студентів у кого lesson менше ніж 4
+db.students.aggregate([
+    {
+        $addFields: {
+            lessonsCount:{$size:'$lessons'}
+        }
+    },
+    {
+        $match: {
+            lessonsCount: {$lt: 4}
+        }
+    },
+    {
+        $sort: {lessonsCount: -1}
+    },
+    {
+        //відключаємо
+        $project:{
+            lessonsCount:0
+        }
+    }
+])
+
+
+
+db.students.find({_id: ObjectId('687bb98f532e70670cbe50c0')})
+
+
+
+db.teacher.find();
+db.students.find();
