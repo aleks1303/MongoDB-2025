@@ -40,7 +40,6 @@ db.teacher.aggregate([
 
 
 //поєднування колекцій і робота з ними
-.
 db.teacher.aggregate([
     {
         $lookup: {
@@ -49,8 +48,56 @@ db.teacher.aggregate([
             foreignField: 'class',
             as: 'myStudents'
         }
+    },
+    // {
+    //     $sort: {'class_curator': 1}
+    // },
+    // {
+    //     $limit: 2
+    // },
+    // {
+    //     $skip: 1
+    // }
+    {
+        // $match: {'myStudents.name': 'Ivan'}
+        $match: {'myStudents.parents.profession': 'teacher'}
     }
-])
+]);
+
+
+// тут краще спочатку знайти, а потім об'єднати
+// це менше навантажує server
+db.teacher.aggregate([
+
+    {
+        $match: {class_curator: {$gt: 5}}
+    },
+    {
+        $lookup: {
+            from: 'students',
+            localField: 'class_curator',
+            foreignField: 'class',
+            as: 'myStudents'
+        }
+    },
+    {
+        $sort: {class_curator:1}
+
+    },
+    {
+        $unwind: '$myStudents'
+    },
+    {
+        $unwind: '$myStudents.parents'
+    },
+    {
+        $match: {'myStudents.parents.profession': 'doctor'}
+    },
+    {
+        $count: 'DoctorCount'
+    }
+
+]);
 
 
 db.teacher.find();
